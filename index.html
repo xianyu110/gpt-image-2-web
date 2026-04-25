@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GPT Image 2 Studio</title>
+    <meta
+      name="description"
+      content="一个部署在 GitHub Pages 上的 GPT Image 2 在线生图与图片编辑工具，支持 MaynorAPIPro 兼容接口。"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Noto+Serif+SC:wght@500;700;900&family=Space+Grotesk:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+    <header class="hero">
+      <nav class="nav" aria-label="主导航">
+        <a class="brand" href="#top" aria-label="GPT Image 2 Studio 首页">
+          <span class="brand-mark">G2</span>
+          <span>GPT Image 2 Studio</span>
+        </a>
+        <div class="nav-links">
+          <a href="#studio">开始生成</a>
+          <a href="#presets">提示词</a>
+          <a href="#security">安全说明</a>
+        </div>
+      </nav>
+
+      <section class="hero-grid" id="top">
+        <div class="hero-copy reveal">
+          <p class="eyebrow">MaynorAPIPro · GPT Image 2</p>
+          <h1>把一句话变成可下载的商业视觉。</h1>
+          <p class="lede">
+            支持 GPT Image 2 文生图、GPT Image 2 All 多图参考合成，以及上传图片编辑。
+            API Key 只保存在你的浏览器本地，不会写入仓库或 GitHub Pages。
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#studio">打开工作台</a>
+            <button class="button ghost" type="button" data-fill-sample>填入示例提示词</button>
+          </div>
+        </div>
+
+        <div class="hero-card reveal delay-1" aria-label="功能概览">
+          <div class="card-topline">
+            <span>Live Endpoint</span>
+            <span class="status-dot">Ready</span>
+          </div>
+          <div class="endpoint">/v1/images/generations</div>
+          <div class="spec-grid">
+            <span>model</span><strong>gpt-image-2</strong>
+            <span>mode</span><strong>Text / Image Edit</strong>
+            <span>output</span><strong>URL / base64</strong>
+          </div>
+        </div>
+      </section>
+    </header>
+
+    <main>
+      <section class="studio shell reveal delay-2" id="studio">
+        <div class="section-heading">
+          <p class="eyebrow">Studio</p>
+          <h2>生成设置</h2>
+          <p>默认使用你给的兼容 API 地址；如果接口变更，可以在这里修改 Base URL。</p>
+        </div>
+
+        <form class="panel generator" id="imageForm">
+          <div class="mode-tabs" role="tablist" aria-label="生成模式">
+            <label>
+              <input type="radio" name="mode" value="generate" checked />
+              <span>文生图</span>
+            </label>
+            <label>
+              <input type="radio" name="mode" value="url-edit" />
+              <span>URL 多图合成</span>
+            </label>
+            <label>
+              <input type="radio" name="mode" value="file-edit" />
+              <span>上传图片编辑</span>
+            </label>
+          </div>
+
+          <div class="form-grid two">
+            <label class="field">
+              <span>Base URL</span>
+              <input id="baseUrl" name="baseUrl" type="url" value="https://apipro.maynor1024.live" required />
+            </label>
+            <label class="field secret-field">
+              <span>API Key</span>
+              <input id="apiKey" name="apiKey" type="password" autocomplete="off" placeholder="sk-..." required />
+              <button type="button" id="toggleKey" aria-label="显示或隐藏 API Key">显示</button>
+            </label>
+          </div>
+
+          <label class="field prompt-field">
+            <span>提示词</span>
+            <textarea
+              id="prompt"
+              name="prompt"
+              rows="7"
+              required
+              placeholder="描述你想生成或编辑的画面，包含主体、场景、风格、构图、光线、比例、文字要求..."
+            ></textarea>
+          </label>
+
+          <div class="mode-extra" data-mode-panel="url-edit" hidden>
+            <label class="field">
+              <span>参考图片 URL（每行一个）</span>
+              <textarea
+                id="imageUrls"
+                rows="4"
+                placeholder="https://example.com/image-1.png&#10;https://example.com/image-2.jpg"
+              ></textarea>
+            </label>
+          </div>
+
+          <div class="mode-extra" data-mode-panel="file-edit" hidden>
+            <label class="field file-field">
+              <span>上传图片（可多选）</span>
+              <input id="imageFiles" type="file" accept="image/*" multiple />
+            </label>
+          </div>
+
+          <div class="form-grid four">
+            <label class="field">
+              <span>模型</span>
+              <select id="model" name="model">
+                <option value="gpt-image-2">gpt-image-2</option>
+                <option value="gpt-image-2-all">gpt-image-2-all</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>尺寸</span>
+              <select id="size" name="size">
+                <option value="1024x1024">1024x1024</option>
+                <option value="1024x1536">1024x1536</option>
+                <option value="1536x1024">1536x1024</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>质量</span>
+              <select id="quality" name="quality">
+                <option value="low">low</option>
+                <option value="medium">medium</option>
+                <option value="high">high</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>格式</span>
+              <select id="format" name="format">
+                <option value="jpeg">jpeg</option>
+                <option value="png">png</option>
+                <option value="webp">webp</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="form-footer">
+            <label class="remember">
+              <input id="rememberKey" type="checkbox" />
+              <span>仅在本机浏览器保存密钥</span>
+            </label>
+            <div class="footer-actions">
+              <button class="button ghost" type="button" id="clearKey">清除密钥</button>
+              <button class="button primary" type="submit" id="submitBtn">生成图片</button>
+            </div>
+          </div>
+        </form>
+
+        <aside class="panel output" aria-live="polite">
+          <div class="output-head">
+            <div>
+              <p class="eyebrow">Result</p>
+              <h2>生成结果</h2>
+            </div>
+            <span class="badge" id="requestState">待开始</span>
+          </div>
+          <div class="result-grid" id="resultGrid">
+            <div class="empty-state">
+              <span>等待第一张图</span>
+              <p>提交后，结果会显示在这里。支持接口返回 URL 或 base64 图片。</p>
+            </div>
+          </div>
+          <details class="debug-box">
+            <summary>查看原始响应</summary>
+            <pre id="rawResponse">{}</pre>
+          </details>
+        </aside>
+      </section>
+
+      <section class="shell presets reveal" id="presets">
+        <div class="section-heading compact">
+          <p class="eyebrow">Prompt Recipes</p>
+          <h2>可直接套用的提示词</h2>
+        </div>
+        <div class="preset-grid">
+          <button class="preset-card" type="button" data-prompt="为一家精品咖啡店生成一张社交媒体海报：复古胶片质感，焦糖色拿铁在深绿色大理石台面上，窗边自然光，画面上方留出中文标题空间，商业摄影，高级杂志排版。">
+            <span>01</span><strong>咖啡海报</strong><p>复古胶片、商品摄影、留标题空间。</p>
+          </button>
+          <button class="preset-card" type="button" data-prompt="生成一张电商主图：透明玻璃精华瓶，水滴与白色花瓣环绕，浅米色渐变背景，柔和棚拍灯光，干净高级，中心构图，适合护肤品详情页。">
+            <span>02</span><strong>电商主图</strong><p>护肤品、棚拍灯光、干净高级。</p>
+          </button>
+          <button class="preset-card" type="button" data-prompt="生成一张儿童绘本插画：小海獭戴着黄色雨帽，在海边修理一艘玩具船，暖色水彩，圆润角色，温柔幽默，适合 4-8 岁读者。">
+            <span>03</span><strong>绘本插画</strong><p>水彩、圆润角色、温柔叙事。</p>
+          </button>
+        </div>
+      </section>
+
+      <section class="shell security reveal" id="security">
+        <div class="panel security-panel">
+          <div>
+            <p class="eyebrow">Security</p>
+            <h2>关于 API Key</h2>
+          </div>
+          <ul>
+            <li>我没有把你提供的 Key 写入任何文件，也不会提交到 GitHub。</li>
+            <li>GitHub Pages 是纯静态托管，浏览器调用接口时 Key 会存在于本次请求中。</li>
+            <li>如果你勾选“保存密钥”，Key 只保存在当前浏览器的 localStorage。</li>
+            <li>如果要公开给别人使用，建议后续增加后端代理和登录/额度限制。</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>Built for GPT Image 2</span>
+      <a href="https://5oq7d57fbk.apifox.cn/api-449533795" target="_blank" rel="noreferrer">接口参考</a>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
