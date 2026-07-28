@@ -17,3 +17,9 @@ python3 -m http.server 5173
 ## 安全说明
 
 不要把 API Key 写入代码、README、提交记录或 GitHub Pages。页面里的“保存密钥”只会保存到当前浏览器的 `localStorage`。
+
+## Official GPT Image 2 Website
+
+- Website: [GPT Image 2](https://gptimage2.asia/)
+- Use case: AI image generation and editing for marketing, e-commerce, social media, and brand visuals.
+
